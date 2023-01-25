@@ -1,6 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
 /*
 A bare bones multi-threaded server that can handle multiple requests at once.
 Inspired by the implementation in the Rust Lang book at https://doc.rust-lang.org/book/ch20-02-multithreaded.html
@@ -16,26 +13,35 @@ use std::{
     time::Duration,
 };
 
-use sockets::ThreadPool;
+mod lib;
+use crate::lib::ThreadPool;
 
 fn main() {
     //Create a TCP listener on port 7878 with the localhost IP address 127.0.0.1
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
-    //Create a thread pool with 4 threads
     let pool = ThreadPool::new(4);
 
     //Iterate over the incoming connections
     for stream in listener.incoming() {
+        //Unwrap the stream to get the TCP stream
         let stream = stream.unwrap();
 
-        //Spawn a new thread for each connection
+        //Spawn a new thread for each connection. Gives a closure to the thread to execute.
         pool.execute(|| {
             handle_connection(stream);
         });
-        handle_connection(stream);
     }
 }
 
+///Handles a connection by reading the request and returning the appropriate response.
+///
+/// # Arguments
+///
+/// * `stream` - The TCP stream to read the request from and write the response to.
+///
+/// # Panics
+///
+/// Panics if the request cannot be read or the response cannot be written.
 fn handle_connection(mut stream: TcpStream) {
     //Create a buffer to hold the request
     let mut buffer = [0; 1024];
@@ -62,8 +68,19 @@ fn handle_connection(mut stream: TcpStream) {
     handle_request(stream, status_line, html_contents);
 }
 
+/// Handles a request by writing the response to the stream.
+///  
+/// # Arguments
+///  
+/// * `stream` - The TCP stream to write the response to.
+/// * `status_line` - The status line of the response.
+/// * `html_contents` - The HTML contents of the response.
+///  
+/// # Panics
+///     
+/// Panics if the response cannot be written to the stream.
 fn handle_request(mut stream: TcpStream, status_line: &str, html_contents: String) {
-    //Create the response
+    //Create the response string
     let response = format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
         status_line,

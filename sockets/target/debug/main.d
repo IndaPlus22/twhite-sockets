@@ -1,0 +1,1 @@
+/mnt/c/Users/timel/indapluswindows/twhite-sockets/sockets/target/debug/main: /mnt/c/Users/timel/indapluswindows/twhite-sockets/sockets/src/bin/lib.rs /mnt/c/Users/timel/indapluswindows/twhite-sockets/sockets/src/bin/main.rs
